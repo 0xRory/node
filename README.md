@@ -35,7 +35,13 @@ $ pnpm run test:e2e
 # test coverage
 $ pnpm run test:cov
 ```
+## create batch
+$ pnpm execute batch-create {count}
 
+ex
+```
+pnpm execute batch-create 2
+```
 ## Support
 
 
