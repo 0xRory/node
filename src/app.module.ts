@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TerminusModule } from '@nestjs/terminus';
-import { WallectModule } from './modules/wallect/module';
+import { WallectModule } from './modules/wallet/module';
 import { Wallet } from './entities/wallect.entity';
 
 @Module({

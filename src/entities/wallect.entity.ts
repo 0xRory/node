@@ -10,7 +10,7 @@ export class Wallet {
   @Column({ nullable: true })
   phone?: string;
   @Column({ nullable: true })
-  hash?: string;
+  certificate?: string;
   @Column({ nullable: true })
   password?: string;
 }
