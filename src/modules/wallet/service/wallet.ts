@@ -16,6 +16,21 @@ export class WalletService {
     @InjectRepository(Wallet)
     private readonly walletRepository: Repository<Wallet>,
   ) {}
+  //'asthma prize volume artefact mule gentle drastic amused general wait barrel student';
+  async create() {
+    const mnemonic =
+      'asthma prize volume artefact mule gentle drastic amused general wait barrel student';
+    // create HD wallet
+    const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
+
+    // generate path：m / purpose' / coin_type' / account' / change / address_index
+    const basePath = "m/44'/60'/0'/0";
+    const hdNodeNew = hdNode.derivePath(basePath + '/' + 8);
+    // const walletNew = new ethers.Wallet(hdNodeNew.privateKey);
+    // Create AA Wallet with HD Wallet
+    console.log(hdNodeNew);
+    return '';
+  }
   async batchCreate(numWallet: number): Promise<string> {
     //const wallets = [];
     // send five wallets
