@@ -1,5 +1,5 @@
 import { ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Post, Res, Body } from '@nestjs/common';
+import { Controller, Get, Post, Res, Body, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { WalletService } from '../service';
 @ApiTags('Wallet')
@@ -59,7 +59,7 @@ export class WalletController {
   }
   @Get('/getBalance')
   public async getBalance(
-    @Body() certificate: string,
+    @Query() certificate: string,
     @Res() res: Response,
   ): Promise<undefined> {
     const result = await this.service.getBalance(certificate);
