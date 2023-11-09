@@ -21,7 +21,7 @@ export class WalletController {
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
-  @Post('/check')
+  @Get('/check')
   public async check(@Body() certificate: string, @Res() res: Response) {
     const result = await this.service.check(certificate);
     res
@@ -47,9 +47,9 @@ export class WalletController {
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
-  @Post('/checkOp')
+  @Get('/checkOp')
   public async checkOp(
-    @Body() op: string,
+    @Query() op: string,
     @Res() res: Response,
   ): Promise<undefined> {
     const result = await this.service.checkOp(op);
