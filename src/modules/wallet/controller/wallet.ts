@@ -2,6 +2,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Post, Res, Body, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { WalletService } from '../service';
+import {RequestModel} from "./request.model";
 @ApiTags('Wallet')
 @Controller('wallet')
 export class WalletController {
@@ -15,34 +16,32 @@ export class WalletController {
   //   return this.service.batchCreate();
   // }
   @Post('/bind')
-  public async bind(certificate: string, @Res() res: Response) {
-    const result = await this.service.bind(certificate);
+  public async bind(@Body() dto: RequestModel, @Res() res: Response) {
+    const result = await this.service.bind(dto.certificate);
     res
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
   @Get('/check')
-  public async check(@Body() certificate: string, @Res() res: Response) {
+  public async check(@Query() certificate: string, @Res() res: Response) {
     const result = await this.service.check(certificate);
     res
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
   @Post('/clearBind')
-  public async clearBind(@Body() certificate: string, @Res() res: Response) {
-    const result = await this.service.clearBind(certificate);
+  public async clearBind(@Body() model: RequestModel, @Res() res: Response) {
+    const result = await this.service.clearBind(model.certificate);
     res
       .status(result.status)
       .json({ message: result.message, data: result.data });
   }
   @Post('/transfer')
   public async transfer(
-    @Body() from: string,
-    @Body() to: string,
-    @Body() value: string,
+    @Body() dto: RequestModel,
     @Res() res: Response,
   ): Promise<undefined> {
-    const result = await this.service.transfer(from, to, value);
+    const result = await this.service.transfer(dto.from, dto.to, dto.value);
     res
       .status(result.status)
       .json({ message: result.message, data: result.data });
