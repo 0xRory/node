@@ -50,13 +50,14 @@ export class WalletService {
         const json = await wallet.encrypt(pwd);
 
         // generate path：m / purpose' / coin_type' / account' / change / address_index
-        const basePath = "m/44'/60'/0'/0";
-        const hdNodeNew = hdNode.derivePath(basePath + '/' + i);
+        // const basePath = "m/44'/60'/0'/0";
+        // const hdNodeNew = hdNode.derivePath(basePath + '/' + i);
+
         // const walletNew = new ethers.Wallet(hdNodeNew.privateKey);
         // Create AA Wallet with HD Wallet
         const primeSdk = new PrimeSdk(
           {
-            privateKey: hdNodeNew.privateKey,
+            privateKey: hdNode.privateKey,
           },
           {
             chainId: 11155111,
@@ -299,7 +300,7 @@ export class WalletService {
     } else {
       const wallet: Wallet = await this.walletRepository.findOne({
         where: {
-          certificate: certificate,
+          certificate: certificate['certificate'],
         },
       });
       const pwd = 'planckerDev';
@@ -319,9 +320,9 @@ export class WalletService {
         privateKey: privateKey,
       },
       {
-        chainId: 80001,
+        chainId: 11155111,
         projectKey: '',
-        rpcProviderUrl: 'https://mumbai-bundler.etherspot.io/',
+        rpcProviderUrl: 'https://sepolia-bundler.etherspot.io/',
       },
     );
 
@@ -330,6 +331,7 @@ export class WalletService {
   async getBalance(certificate: string): Promise<Response | undefined> {
     try {
       const primeSdk = await this._createPrimeSdk(certificate);
+      //const address = await primeSdk.getCounterFactualAddress();
       const balance = await primeSdk.getNativeBalance();
 
       console.log('balances: ', balance);
