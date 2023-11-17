@@ -14,7 +14,7 @@ import { Wallet } from './entities/wallect.entity';
     }),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'db.sql',
+      database: 'db.db',
       autoLoadEntities: true,
       entities: [Wallet],
       synchronize: true,
