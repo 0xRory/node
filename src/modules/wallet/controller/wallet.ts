@@ -2,7 +2,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Post, Res, Body, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { WalletService } from '../service';
-import {RequestModel} from "./request.model";
+import { RequestModel } from './request.model';
 @ApiTags('Wallet')
 @Controller('wallet')
 export class WalletController {
@@ -10,6 +10,10 @@ export class WalletController {
   @Get('/createOne')
   public async create(): Promise<string> {
     return this.service.create();
+  }
+  @Get('/test')
+  public async test(): Promise<string> {
+    return '123';
   }
   // @Get('/batchCreate')
   // public async batchCreate(): Promise<string> {
