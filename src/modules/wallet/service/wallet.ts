@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { Wallet } from '../../../entities/wallect.entity';
-import { PrimeSdk } from '@etherspot/prime-sdk';
+import {PrimeSdk, WalletConnectWalletProvider} from '@etherspot/prime-sdk';
 import { ethers } from 'ethers';
+import {response} from "express";
+import * as stream from "stream";
 
 interface Response {
   status: number;
@@ -202,17 +204,33 @@ export class WalletService {
     //** example
 
     // get from wallet
-    const fromWallet: Wallet = await this.walletRepository.findOne({
-      where: {
-        certificate: fromCertificate,
-      },
-    });
+    const fromWallets: Wallet[] = await this.walletRepository.findBy({});
+    let fromWallet: Wallet
+    for (let i = 0; i < fromWallets.length; i++) {
+      if (fromWallets[i].certificate === fromCertificate){
+        fromWallet = fromWallets[i]
+        break
+      }
+    }
+    // const fromWallet: Wallet = await this.walletRepository.findOne({
+    //   where: {
+    //     certificate: fromCertificate,
+    //   },
+    // });
     // get recipient wallet
-    const recipientWallet: Wallet = await this.walletRepository.findOne({
-      where: {
-        certificate: toCertificate,
-      },
-    });
+    // const recipientWallet: Wallet = await this.walletRepository.findOne({
+    //   where: {
+    //     certificate: toCertificate,
+    //   },
+    // });
+    const recipientWallets: Wallet[] = await this.walletRepository.findBy({});
+    let recipientWallet: Wallet
+    for (let i = 0; i < recipientWallets.length; i++) {
+      if (recipientWallets[i].certificate === toCertificate){
+        recipientWallet = recipientWallets[i]
+        break
+      }
+    }
     if (!fromWallet || !recipientWallet) {
       return {
         status: 404,
@@ -238,7 +256,7 @@ export class WalletService {
     console.log('balances: ', balance);
 
     // balance > value
-    if (balance > value) {
+    if (balance < value) {
       return {
         status: 400,
         message: 'balance is not enough',
@@ -266,7 +284,7 @@ export class WalletService {
       const primeSdk = await this._createPrimeSdk('');
 
       //0x11782af2acd41bf5573d587ff866546eb2e53ea354af6607001fbcd0a28f3ae6
-      const userOpsReceipt = await primeSdk.getUserOpReceipt(op);
+      const userOpsReceipt = await primeSdk.getUserOpReceipt(op["op"]);
 
       if (userOpsReceipt.success) {
         return {
@@ -298,20 +316,32 @@ export class WalletService {
       const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
       privateKey = hdNode.privateKey;
     } else {
-      const wallet: Wallet = await this.walletRepository.findOne({
-        where: {
-          certificate: certificate['certificate'],
-        },
-      });
-      const pwd = 'planckerDev';
-      const wallet2 = await ethers.Wallet.fromEncryptedJson(
-        JSON.parse(wallet.password),
-        pwd,
-      );
-      const mnemonic = wallet2['mnemonic'].phrase;
+      let wallet : Wallet
+      const wallets: Wallet[] = await this.walletRepository.findBy({});
+      for (let i = 0; i < wallets.length; i++) {
+        if (typeof(certificate) === "string"){
+          if (wallets[i].certificate === certificate){
+            wallet = wallets[i]
+            break
+          }
+        }else{
+          if (wallets[i].certificate === certificate["Certificate"]){
+            wallet = wallets[i]
+            break
+          }
+        }
+      }
+      if (wallet!=null){
+        const pwd = 'planckerDev';
+        const wallet2 = await ethers.Wallet.fromEncryptedJson(
+            JSON.parse(wallet.password),
+            pwd,
+        );
+        const mnemonic = wallet2['mnemonic'].phrase;
 
-      const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
-      privateKey = hdNode.privateKey;
+        const hdNode = ethers.HDNodeWallet.fromPhrase(mnemonic);
+        privateKey = hdNode.privateKey
+      }
     }
 
     // Create AA Wallet with HD Wallet
@@ -331,7 +361,7 @@ export class WalletService {
   async getBalance(certificate: string): Promise<Response | undefined> {
     try {
       const primeSdk = await this._createPrimeSdk(certificate);
-      //const address = await primeSdk.getCounterFactualAddress();
+      const address = await primeSdk.getCounterFactualAddress();
       const balance = await primeSdk.getNativeBalance();
 
       console.log('balances: ', balance);
